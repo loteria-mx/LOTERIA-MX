@@ -1,0 +1,2717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotería · Gallo de Don Clemente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+        }
+
+        body {
+            background: #1e3a2f;
+            background-image: radial-gradient(circle at 10% 20%, #2a5a44, #0f281e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 540px;
+            background: #f5efe6;
+            border-radius: 44px 44px 32px 32px;
+            padding: 20px 18px 22px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 0 2px #b48c5c inset, 0 0 0 5px #e6d5b8 inset;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .app-container::before {
+            content: "♠ ♥ ♦ ♣";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e3a2f;
+            color: #d4af37;
+            font-size: 0.8rem;
+            letter-spacing: 6px;
+            padding: 0 18px;
+            border-radius: 30px;
+            border: 2px solid #b48c5c;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+        }
+
+        .titulo-principal {
+            text-align: center;
+            font-family: 'Times New Roman', 'Georgia', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: #d4af37;
+            text-shadow: 
+                2px 2px 0 #7a5e32,
+                4px 4px 0 rgba(30, 58, 47, 0.9),
+                0 6px 15px rgba(0, 0, 0, 0.4);
+            letter-spacing: 10px;
+            margin: 0 0 12px 0;
+            padding: 6px 0 4px 0;
+            border-bottom: 3px solid #b48c5c;
+            border-top: 3px solid #b48c5c;
+            background: linear-gradient(180deg, rgba(30, 58, 47, 0.15) 0%, transparent 50%, rgba(30, 58, 47, 0.15) 100%);
+            border-radius: 12px;
+            position: relative;
+            line-height: 1.1;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .titulo-principal small {
+            display: block;
+            font-size: 0.65rem;
+            letter-spacing: 14px;
+            color: #ecd6b0;
+            text-shadow: 1px 1px 0 #3d2a1a;
+            font-weight: 400;
+            margin-top: -2px;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        .vista-individual {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .historial-container {
+            width: 100%;
+            margin-bottom: 14px;
+            background: #dac9b0;
+            padding: 6px 10px 8px 10px;
+            border-radius: 60px;
+            border: 2px solid #b48c5c;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+        .historial-container.visible {
+            display: block;
+        }
+
+        .titulo-historial {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #3d2a1a;
+            font-weight: 600;
+            padding: 0 8px 3px 8px;
+            letter-spacing: 0.5px;
+        }
+        .titulo-historial span:last-child {
+            background: #1e3a2f;
+            color: #ecd6b0;
+            padding: 0 12px;
+            border-radius: 40px;
+            font-size: 0.65rem;
+        }
+
+        .carrusel-historial {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 4px 4px 8px 4px;
+            scroll-behavior: smooth;
+            min-height: 62px;
+            align-items: center;
+            background: #e9ddcc;
+            border-radius: 40px;
+            border: 1px solid #b48c5c;
+            scrollbar-width: thin;
+            scrollbar-color: #b48c5c #dac9b0;
+            position: relative;
+        }
+        .carrusel-historial::-webkit-scrollbar {
+            height: 5px;
+        }
+        .carrusel-historial::-webkit-scrollbar-track {
+            background: #dac9b0;
+            border-radius: 20px;
+        }
+        .carrusel-historial::-webkit-scrollbar-thumb {
+            background: #b48c5c;
+            border-radius: 20px;
+        }
+
+        .carta-historial-item {
+            flex: 0 0 52px;
+            height: 62px;
+            background: #fefcf7;
+            border: 2px solid #9e7b4b;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 #6b4f2b;
+            transition: 0.15s;
+            position: relative;
+        }
+        .carta-historial-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fdfaf3;
+        }
+        .carta-historial-item.ganadora-historial {
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 20px #d4af37, 0 3px 0 #6b4f2b;
+            transform: scale(1.03);
+        }
+        .carta-historial-item .numero-orden {
+            position: absolute;
+            top: 0px;
+            right: 2px;
+            font-size: 0.45rem;
+            font-weight: 700;
+            color: #fefcf7;
+            background: rgba(30, 58, 47, 0.8);
+            padding: 0px 6px;
+            border-radius: 30px;
+            border: 1px solid #b48c5c;
+        }
+        .historial-vacio {
+            color: #6b4f2b;
+            font-size: 0.75rem;
+            padding: 12px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-barajar-container {
+            display: none;
+            width: 100%;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+        .btn-barajar-container.visible {
+            display: flex;
+        }
+
+        .btn-barajar {
+            background: #d4af37;
+            border: 3px solid #b48c5c;
+            border-radius: 60px;
+            padding: 12px 36px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #1e3a2f;
+            box-shadow: 0 6px 0 #7a5e32, 0 8px 16px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: 0.08s linear;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-barajar:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7a5e32;
+        }
+        .btn-barajar:disabled {
+            opacity: 0.6;
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7a5e32;
+            cursor: not-allowed;
+        }
+
+        .carta-central {
+            width: 230px;
+            height: 320px;
+            background: #fdfaf3;
+            border: 5px solid #b48c5c;
+            border-radius: 18px;
+            box-shadow: 0 10px 0 #6b4f2b, 0 12px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: 0.15s;
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .carta-central img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fdfaf3;
+        }
+        .carta-central.oculta {
+            background: #2a4a3a;
+            border: 5px solid #7a5e32;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .carta-central.oculta img {
+            display: none;
+        }
+        .carta-central.oculta::after {
+            content: "?";
+            color: #ecd6b0;
+            font-size: 5rem;
+            font-weight: 700;
+            text-shadow: 0 4px 0 #4a3720;
+        }
+
+        .carta-central.ganadora {
+            border: 5px solid #d4af37;
+            animation: resplandorOro 0.5s infinite alternate;
+            transform: scale(1.02);
+        }
+        @keyframes resplandorOro {
+            0% {
+                box-shadow: 0 0 15px #d4af37, 0 10px 0 #6b4f2b;
+            }
+            100% {
+                box-shadow: 0 0 45px #f7d44a, 0 0 70px #d4af37, 0 10px 0 #6b4f2b;
+            }
+        }
+
+        .carta-central .nombre-superior {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: #3d2a1a;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1.5px solid #b48c5c;
+            z-index: 15;
+            white-space: nowrap;
+            max-width: 92%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: none;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(2px);
+        }
+
+        .carta-central .nombre-superior.visible {
+            display: block;
+        }
+
+        .carta-central .nombre-superior .personalizacion-carta {
+            color: #b22222;
+            font-weight: 700;
+            font-size: 0.5rem;
+        }
+
+        .carta-central.es-ganadora .nombre-superior {
+            display: none !important;
+        }
+
+        .carta-central.oculta .nombre-superior {
+            display: none !important;
+        }
+
+        .carta-central .nombre-personalizado {
+            display: none;
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #b22222;
+            background: #fef7e6;
+            border: 4px solid #b48c5c;
+            padding: 6px 18px;
+            border-radius: 40px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            box-shadow: 0 6px 0 #6b4f2b;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .carta-central.barajeando {
+            animation: barajaCarta 0.08s infinite alternate;
+        }
+        @keyframes barajaCarta {
+            0% {
+                transform: rotate(-15deg) scale(0.8) translateX(-20px);
+                opacity: 0.2;
+            }
+            25% {
+                transform: rotate(-5deg) scale(0.95) translateX(-8px);
+                opacity: 0.6;
+            }
+            50% {
+                transform: rotate(0deg) scale(1.05) translateX(0px);
+                opacity: 0.9;
+            }
+            75% {
+                transform: rotate(5deg) scale(0.95) translateX(8px);
+                opacity: 0.6;
+            }
+            100% {
+                transform: rotate(15deg) scale(0.8) translateX(20px);
+                opacity: 0.2;
+            }
+        }
+
+        .carta-central.seleccionando {
+            animation: pulseSeleccion 0.5s infinite alternate;
+            border-color: #d4af37;
+        }
+        @keyframes pulseSeleccion {
+            0% { box-shadow: 0 0 10px #d4af37, 0 10px 0 #6b4f2b; }
+            100% { box-shadow: 0 0 40px #f7d44a, 0 0 60px rgba(212, 175, 55, 0.4), 0 10px 0 #6b4f2b; }
+        }
+
+        .carta-central .progress-ring {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            display: none;
+            z-index: 10;
+        }
+        .carta-central .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+        .carta-central .progress-ring .bg-circle {
+            fill: none;
+            stroke: rgba(255,255,255,0.3);
+            stroke-width: 4;
+        }
+        .carta-central .progress-ring .progress-circle {
+            fill: none;
+            stroke: #d4af37;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 113.097;
+            stroke-dashoffset: 113.097;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+        .carta-central .progress-ring .label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ecd6b0;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .carrusel-historial.barajeando .carta-historial-item {
+            animation: itemBaraja 0.12s infinite alternate;
+        }
+        @keyframes itemBaraja {
+            0% {
+                transform: scale(0.5) rotate(-10deg) translateX(-15px);
+                opacity: 0.1;
+            }
+            50% {
+                transform: scale(1.15) rotate(0deg) translateX(0px);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.5) rotate(10deg) translateX(15px);
+                opacity: 0.1;
+            }
+        }
+
+        .carrusel-historial.barajeando::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(212, 175, 55, 0.3) 30%,
+                    rgba(212, 175, 55, 0.6) 50%,
+                    rgba(212, 175, 55, 0.3) 70%,
+                    transparent 100%);
+            animation: destelloBaraja 0.3s infinite;
+            pointer-events: none;
+            border-radius: 40px;
+        }
+        @keyframes destelloBaraja {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .carta-central.barajeando::before {
+            content: '🃏';
+            position: absolute;
+            font-size: 2rem;
+            animation: cartaVoladora 0.5s infinite;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 5;
+        }
+        @keyframes cartaVoladora {
+            0% {
+                transform: translate(-70px, -90px) rotate(0deg) scale(0.3);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(70px, 90px) rotate(360deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        .carta-central.barajeando::after {
+            content: '🃏';
+            position: absolute;
+            font-size: 1.8rem;
+            animation: cartaVoladora2 0.7s infinite 0.2s;
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 5;
+        }
+        @keyframes cartaVoladora2 {
+            0% {
+                transform: translate(60px, -70px) rotate(0deg) scale(0.3);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-60px, 80px) rotate(-360deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        .app-container.revolviendo .carta-central.oculta {
+            animation: parpadeoRevolver 0.1s infinite alternate;
+        }
+        @keyframes parpadeoRevolver {
+            0% {
+                opacity: 0.2;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+        .app-container.revolviendo .btn {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .app-container.revolviendo .carrusel-historial {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .mensaje-ganador {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #b22222;
+            background: #fef7e6;
+            border: 4px solid #d4af37;
+            padding: 6px 24px;
+            border-radius: 60px;
+            box-shadow: 0 6px 0 #6b4f2b;
+            display: none;
+            margin-top: 4px;
+            text-shadow: 1px 1px 0 #f5d78c;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+        .mensaje-ganador.visible {
+            display: block;
+            animation: aparecer 0.4s;
+        }
+        .mensaje-ganador:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 0 #6b4f2b, 0 0 30px rgba(212, 175, 55, 0.4);
+        }
+        .mensaje-ganador .icono-ganador {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 2rem;
+            animation: girar 2s infinite linear;
+        }
+        @keyframes girar {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes aparecer {
+            0% {
+                transform: scale(0.6);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .vista-cuadricula {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .vista-cuadricula h2 {
+            font-family: 'Times New Roman', serif;
+            color: #3d2a1a;
+            background: #dac9b0;
+            padding: 4px 24px;
+            border-radius: 60px;
+            border: 2px solid #b48c5c;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            width: 100%;
+            margin-bottom: 18px;
+            background: #dac9b0;
+            padding: 8px;
+            border-radius: 24px;
+            border: 3px solid #b48c5c;
+        }
+        .carta-grid {
+            aspect-ratio: 1/1.4;
+            background: #fdfaf3;
+            border: 2px solid #7a5e32;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 3px 0 #5a4322;
+            cursor: pointer;
+            transition: 0.1s;
+            overflow: hidden;
+        }
+        .carta-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fdfaf3;
+        }
+        /* Franja de precios con fondo blanco, texto negro y negrita - TAMAÑO ORIGINAL */
+        .carta-grid .costos-grid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #ffffff;
+            padding: 2px 0;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.5rem;
+            font-weight: 700;
+            color: #000000;
+            border-radius: 0 0 6px 6px;
+            border-top: 1px solid #7a5e32;
+        }
+        .carta-grid .costos-grid span {
+            font-weight: 700;
+            color: #000000;
+            text-shadow: none;
+        }
+        .carta-grid.marcada {
+            background: #a0937a !important;
+            border-color: #5a4322;
+            opacity: 0.7;
+            transform: scale(0.95);
+        }
+        .carta-grid.marcada .costos-grid {
+            display: none;
+        }
+        .carta-grid.marcada img {
+            filter: grayscale(1) brightness(0.5);
+        }
+        .carta-grid.ganadora-grid {
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 20px #d4af37, 0 3px 0 #5a4322;
+            transform: scale(1.03);
+            animation: resplandorGanador 0.8s infinite alternate;
+        }
+        @keyframes resplandorGanador {
+            0% {
+                box-shadow: 0 0 15px #d4af37, 0 3px 0 #5a4322;
+            }
+            100% {
+                box-shadow: 0 0 45px #f7d44a, 0 0 70px #d4af37, 0 3px 0 #5a4322;
+            }
+        }
+        .carta-grid .badge-ganador {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+            display: none;
+            z-index: 10;
+        }
+        .carta-grid.ganadora-grid .badge-ganador {
+            display: block;
+        }
+
+        .vista-listado-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #1e3a2f;
+            background-image: radial-gradient(circle at 10% 20%, #2a5a44, #0f281e);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+        .vista-listado-fullscreen.activo {
+            display: flex;
+        }
+        .vista-listado-fullscreen .cerrar-fullscreen {
+            position: fixed;
+            top: 12px;
+            right: 20px;
+            font-size: 2rem;
+            color: #ecd6b0;
+            background: rgba(30, 58, 47, 0.9);
+            border: 3px solid #b48c5c;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10000;
+            transition: 0.2s;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .vista-listado-fullscreen .cerrar-fullscreen:hover {
+            transform: scale(1.1);
+            background: #b22222;
+            border-color: #d4af37;
+        }
+        .vista-listado-fullscreen h2 {
+            font-family: 'Times New Roman', serif;
+            color: #ecd6b0;
+            background: rgba(30, 58, 47, 0.85);
+            padding: 4px 24px;
+            border-radius: 60px;
+            border: 3px solid #b48c5c;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+        .listado-fullscreen-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            gap: 4px;
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(218, 201, 176, 0.92);
+            padding: 10px;
+            border-radius: 20px;
+            border: 4px solid #b48c5c;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            max-height: 82vh;
+        }
+
+        .listado-fullscreen-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fefcf7;
+            border: 2px solid #7a5e32;
+            border-radius: 6px;
+            padding: 4px 2px;
+            box-shadow: 0 2px 0 #5a4322;
+            transition: 0.1s;
+            min-height: 0;
+            height: 100%;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .listado-fullscreen-item.ganador-listado {
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 30px #d4af37, 0 2px 0 #5a4322;
+            background: #fef7e6;
+            transform: scale(1.05);
+            animation: resplandorListado 0.8s infinite alternate;
+            cursor: pointer;
+        }
+        @keyframes resplandorListado {
+            0% {
+                box-shadow: 0 0 15px #d4af37, 0 2px 0 #5a4322;
+            }
+            100% {
+                box-shadow: 0 0 45px #f7d44a, 0 0 70px #d4af37, 0 2px 0 #5a4322;
+            }
+        }
+        .listado-fullscreen-item .badge-ganador-listado {
+            font-size: 0.8rem;
+            margin-top: 1px;
+            display: none;
+        }
+        .listado-fullscreen-item.ganador-listado .badge-ganador-listado {
+            display: block;
+        }
+        .listado-fullscreen-item img {
+            width: 100%;
+            max-width: 48px;
+            height: 52px;
+            object-fit: contain;
+            background: #fdfaf3;
+            border-radius: 3px;
+            border: 1px solid #b48c5c;
+            flex-shrink: 0;
+        }
+        .listado-fullscreen-item .listado-info {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 1px 0;
+            gap: 0px;
+            flex: 1;
+            justify-content: center;
+        }
+        .listado-fullscreen-item .listado-index {
+            font-size: 0.55rem;
+            color: #6b4f2b;
+            font-weight: 700;
+            background: #e9ddcc;
+            padding: 0 5px;
+            border-radius: 6px;
+            line-height: 1.3;
+        }
+        .listado-fullscreen-item .listado-nombre {
+            font-weight: 700;
+            color: #1e3a2f;
+            font-size: 0.65rem;
+            line-height: 1.2;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .listado-fullscreen-item .listado-personalizacion {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #1e3a2f;
+            background: #fef7e6;
+            padding: 0 6px;
+            border-radius: 8px;
+            display: inline-block;
+            width: fit-content;
+            border: 1px solid #b48c5c;
+            max-width: 95%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.4;
+        }
+        .listado-fullscreen-item .listado-personalizacion.vacio {
+            color: #6b4f2b;
+            border-color: #9e7b4b;
+            background: #e9ddcc;
+        }
+
+        .modal-carta-grande {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+        .modal-carta-grande.activo {
+            display: flex;
+        }
+        .modal-carta-grande .contenido-grande {
+            background: #f5efe6;
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            border: 5px solid #d4af37;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.3), 0 20px 60px rgba(0,0,0,0.8);
+            text-align: center;
+            position: relative;
+            animation: zoomIn 0.3s ease-out;
+        }
+        @keyframes zoomIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .modal-carta-grande .cerrar-grande {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            font-size: 2rem;
+            color: #ecd6b0;
+            background: #b22222;
+            border: 3px solid #d4af37;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .modal-carta-grande .cerrar-grande:hover {
+            transform: scale(1.1);
+            background: #8b1a1a;
+        }
+        .modal-carta-grande .imagen-grande {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            aspect-ratio: 1/1.4;
+            object-fit: contain;
+            background: #fdfaf3;
+            border-radius: 12px;
+            border: 4px solid #b48c5c;
+            margin-bottom: 12px;
+        }
+        .modal-carta-grande .info-grande {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .modal-carta-grande .info-grande .nombre-grande {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #1e3a2f;
+            font-family: 'Times New Roman', serif;
+        }
+        .modal-carta-grande .info-grande .personalizacion-grande {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #b22222;
+            background: #fef7e6;
+            padding: 4px 16px;
+            border-radius: 30px;
+            border: 2px solid #b48c5c;
+            display: inline-block;
+            margin: 0 auto;
+        }
+        .modal-carta-grande .info-grande .premio-grande {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #d4af37;
+            text-shadow: 1px 1px 0 #7a5e32;
+        }
+        .modal-carta-grande .info-grande .numero-grande {
+            font-size: 0.9rem;
+            color: #6b4f2b;
+        }
+        .modal-carta-grande .badge-gran-ganador {
+            font-size: 1.5rem;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        @media (max-width: 900px) {
+            .listado-fullscreen-grid {
+                gap: 3px;
+                padding: 6px;
+            }
+            .listado-fullscreen-item img {
+                max-width: 38px;
+                height: 44px;
+            }
+            .listado-fullscreen-item .listado-nombre {
+                font-size: 0.55rem;
+            }
+            .listado-fullscreen-item .listado-index {
+                font-size: 0.48rem;
+            }
+            .listado-fullscreen-item .listado-personalizacion {
+                font-size: 0.6rem;
+            }
+            .vista-listado-fullscreen h2 {
+                font-size: 1rem;
+                padding: 3px 16px;
+                margin-bottom: 5px;
+            }
+            .modal-carta-grande .contenido-grande {
+                padding: 20px;
+                max-width: 400px;
+            }
+            .modal-carta-grande .info-grande .nombre-grande {
+                font-size: 1.8rem;
+            }
+        }
+        @media (max-width: 650px) {
+            .listado-fullscreen-grid {
+                gap: 2px;
+                padding: 4px;
+            }
+            .listado-fullscreen-item img {
+                max-width: 30px;
+                height: 36px;
+            }
+            .listado-fullscreen-item .listado-nombre {
+                font-size: 0.48rem;
+            }
+            .listado-fullscreen-item .listado-index {
+                font-size: 0.42rem;
+            }
+            .listado-fullscreen-item .listado-personalizacion {
+                font-size: 0.5rem;
+            }
+            .vista-listado-fullscreen .cerrar-fullscreen {
+                width: 36px;
+                height: 36px;
+                font-size: 1.5rem;
+                top: 8px;
+                right: 12px;
+            }
+            .vista-listado-fullscreen h2 {
+                font-size: 0.8rem;
+                padding: 2px 12px;
+                margin-bottom: 4px;
+            }
+            .modal-carta-grande .contenido-grande {
+                padding: 16px;
+                max-width: 340px;
+            }
+            .modal-carta-grande .info-grande .nombre-grande {
+                font-size: 1.5rem;
+            }
+            .modal-carta-grande .info-grande .personalizacion-grande {
+                font-size: 1rem;
+            }
+            .modal-carta-grande .info-grande .premio-grande {
+                font-size: 1.1rem;
+            }
+        }
+        @media (max-width: 450px) {
+            .listado-fullscreen-grid {
+                gap: 2px;
+                padding: 3px;
+                border-width: 2px;
+            }
+            .listado-fullscreen-item {
+                padding: 2px 1px;
+                border-width: 1px;
+            }
+            .listado-fullscreen-item img {
+                max-width: 24px;
+                height: 30px;
+                border-width: 1px;
+            }
+            .listado-fullscreen-item .listado-nombre {
+                font-size: 0.4rem;
+            }
+            .listado-fullscreen-item .listado-index {
+                font-size: 0.36rem;
+                padding: 0 2px;
+            }
+            .listado-fullscreen-item .listado-personalizacion {
+                font-size: 0.42rem;
+                padding: 0 2px;
+                border-width: 1px;
+            }
+            .vista-listado-fullscreen .cerrar-fullscreen {
+                width: 30px;
+                height: 30px;
+                font-size: 1.2rem;
+                top: 6px;
+                right: 8px;
+            }
+            .vista-listado-fullscreen h2 {
+                font-size: 0.65rem;
+                padding: 2px 10px;
+                margin-bottom: 3px;
+                border-width: 2px;
+            }
+            .listado-fullscreen-grid {
+                max-height: 78vh;
+            }
+
+            .titulo-principal {
+                font-size: 2.2rem;
+                letter-spacing: 6px;
+            }
+            .titulo-principal small {
+                font-size: 0.5rem;
+                letter-spacing: 8px;
+            }
+            .modal-carta-grande .contenido-grande {
+                padding: 12px;
+                max-width: 290px;
+            }
+            .modal-carta-grande .info-grande .nombre-grande {
+                font-size: 1.2rem;
+            }
+            .modal-carta-grande .info-grande .personalizacion-grande {
+                font-size: 0.85rem;
+                padding: 2px 12px;
+            }
+            .modal-carta-grande .info-grande .premio-grande {
+                font-size: 0.95rem;
+            }
+            .modal-carta-grande .cerrar-grande {
+                width: 35px;
+                height: 35px;
+                font-size: 1.5rem;
+                top: -12px;
+                right: -12px;
+            }
+            .carta-central .progress-ring {
+                width: 30px;
+                height: 30px;
+                bottom: 6px;
+            }
+            .carta-central .progress-ring .bg-circle,
+            .carta-central .progress-ring .progress-circle {
+                stroke-width: 3;
+            }
+            .carta-central .progress-ring .label {
+                font-size: 0.55rem;
+            }
+            .carta-central {
+                width: 190px;
+                height: 270px;
+            }
+            .grid-container {
+                gap: 4px;
+                padding: 4px;
+            }
+            .btn {
+                font-size: 0.65rem;
+                padding: 6px 6px;
+                min-width: 60px;
+            }
+            .mensaje-ganador {
+                font-size: 1.2rem;
+                padding: 4px 14px;
+            }
+            .mensaje-ganador .icono-ganador {
+                font-size: 1.4rem;
+                margin-right: 6px;
+            }
+            .modal-seleccion-ganador .grid-seleccion {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 3px;
+            }
+            .modal-seleccion-ganador .grid-seleccion .carta-seleccion .nombre-seleccion {
+                font-size: 0.35rem;
+            }
+        }
+
+        .controles {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 12px;
+            border: 3px solid #6b4f2b;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.08s linear;
+            box-shadow: 0 5px 0 #4a3720;
+            flex: 1;
+            min-width: 70px;
+            max-width: 140px;
+            text-align: center;
+            color: #1e3a2f;
+            background: #ecd6b0;
+            letter-spacing: 0.5px;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #4a3720;
+        }
+        .btn-azul {
+            background: #b48c5c;
+            color: #fefcf7;
+            border-color: #7a5e32;
+            box-shadow: 0 5px 0 #5a4322;
+        }
+        .btn-verde {
+            background: #1e3a2f;
+            color: #ecd6b0;
+            border-color: #0f281e;
+            box-shadow: 0 5px 0 #0a1f17;
+        }
+        .btn-rojo {
+            background: #b22222;
+            color: #fefcf7;
+            border-color: #7a1717;
+            box-shadow: 0 5px 0 #4f0f0f;
+        }
+        .btn-naranja {
+            background: #d4af37;
+            color: #1e3a2f;
+            border-color: #b48c5c;
+            box-shadow: 0 5px 0 #7a5e32;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #4a3720;
+            pointer-events: none;
+        }
+
+        .modal-overlay,
+        .modal-personalizacion {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 25, 20, 0.8);
+            border-radius: 44px 44px 32px 32px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.activo,
+        .modal-personalizacion.activo {
+            display: flex;
+        }
+        .modal-contenido {
+            background: #f5efe6;
+            padding: 24px 20px;
+            border-radius: 40px;
+            max-width: 360px;
+            width: 92%;
+            border: 4px solid #b48c5c;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+        .modal-contenido h3 {
+            color: #1e3a2f;
+            font-size: 1.2rem;
+            border-bottom: 3px solid #b48c5c;
+            padding-bottom: 6px;
+            margin-bottom: 16px;
+        }
+        .selector-valores {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+        .selector-valores button {
+            background: #dac9b0;
+            border: 3px solid #7a5e32;
+            border-radius: 40px;
+            padding: 4px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #5a4322;
+            transition: 0.05s;
+            color: #1e3a2f;
+        }
+        .selector-valores button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #5a4322;
+        }
+        .selector-valores button.activo {
+            background: #d4af37;
+            border-color: #b48c5c;
+            box-shadow: 0 4px 0 #7a5e32;
+        }
+        .fila-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .fila-input label {
+            font-weight: 600;
+            color: #3d2a1a;
+            min-width: 50px;
+            font-size: 0.8rem;
+        }
+        .fila-input input {
+            width: 70px;
+            padding: 6px;
+            border: 2px solid #b48c5c;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: 600;
+            background: #fefcf7;
+        }
+        .btn-aceptar-modal {
+            background: #1e3a2f;
+            color: #ecd6b0;
+            border: 3px solid #b48c5c;
+            border-radius: 60px;
+            padding: 8px 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 0 #0f281e;
+            cursor: pointer;
+            transition: 0.05s;
+            margin-top: 10px;
+        }
+        .btn-aceptar-modal:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0f281e;
+        }
+        .modal-personalizacion .icono-modal img {
+            width: 80px;
+            height: 110px;
+            object-fit: contain;
+            border: 3px solid #b48c5c;
+            border-radius: 12px;
+            background: #fdfaf3;
+        }
+        .modal-personalizacion input {
+            width: 90%;
+            padding: 8px;
+            border: 3px solid #b48c5c;
+            border-radius: 60px;
+            text-align: center;
+            font-weight: 600;
+            margin: 8px 0 14px;
+            background: #fefcf7;
+        }
+        .botones-modal {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn-guardar {
+            background: #1e3a2f;
+            color: #ecd6b0;
+            border: 3px solid #b48c5c;
+            border-radius: 60px;
+            padding: 6px 18px;
+            font-weight: 700;
+            box-shadow: 0 4px 0 #0f281e;
+            cursor: pointer;
+        }
+        .btn-cancelar {
+            background: #b22222;
+            color: #fefcf7;
+            border: 3px solid #7a1717;
+            border-radius: 60px;
+            padding: 6px 18px;
+            font-weight: 700;
+            box-shadow: 0 4px 0 #4f0f0f;
+            cursor: pointer;
+        }
+        .btn-guardar:active,
+        .btn-cancelar:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #4f0f0f;
+        }
+
+        .modal-seleccion-ganador {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 99998;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(6px);
+        }
+        .modal-seleccion-ganador.activo {
+            display: flex;
+        }
+        .modal-seleccion-ganador .contenido-seleccion {
+            background: #f5efe6;
+            border-radius: 30px;
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            border: 5px solid #d4af37;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.2);
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-seleccion-ganador .contenido-seleccion h2 {
+            color: #1e3a2f;
+            font-family: 'Times New Roman', serif;
+            border-bottom: 3px solid #b48c5c;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+        }
+        .modal-seleccion-ganador .contenido-seleccion .subtexto {
+            color: #6b4f2b;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        .modal-seleccion-ganador .grid-seleccion {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+        .modal-seleccion-ganador .grid-seleccion .carta-seleccion {
+            aspect-ratio: 1/1.4;
+            background: #fdfaf3;
+            border: 2px solid #7a5e32;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+            overflow: hidden;
+            position: relative;
+        }
+        .modal-seleccion-ganador .grid-seleccion .carta-seleccion:hover {
+            transform: scale(1.05);
+            border-color: #d4af37;
+        }
+        .modal-seleccion-ganador .grid-seleccion .carta-seleccion img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fdfaf3;
+        }
+        .modal-seleccion-ganador .grid-seleccion .carta-seleccion .nombre-seleccion {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(30, 58, 47, 0.85);
+            color: #ecd6b0;
+            font-size: 0.45rem;
+            padding: 2px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        .modal-seleccion-ganador .grid-seleccion .carta-seleccion.seleccionada {
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 20px #d4af37;
+            transform: scale(1.03);
+        }
+        .modal-seleccion-ganador .grid-seleccion .carta-seleccion.ya-ganadora {
+            opacity: 0.4;
+            pointer-events: none;
+            border-color: #6b4f2b;
+        }
+        .modal-seleccion-ganador .btn-cerrar-seleccion {
+            background: #b22222;
+            color: #fefcf7;
+            border: 3px solid #7a1717;
+            border-radius: 60px;
+            padding: 8px 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 0 #4f0f0f;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.05s;
+        }
+        .modal-seleccion-ganador .btn-cerrar-seleccion:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #4f0f0f;
+        }
+        .modal-seleccion-ganador .mensaje-seleccion {
+            color: #1e3a2f;
+            font-weight: 600;
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="appContainer">
+
+        <div class="titulo-principal">
+            LOTERÍA
+            <small>♠ F L O S A L ♠</small>
+        </div>
+
+        <div class="vista-individual" id="vistaIndividual">
+            <div class="historial-container" id="historialContainer">
+                <div class="titulo-historial">
+                    <span>📜 cartas reveladas</span>
+                    <span id="contadorHistorial">0</span>
+                </div>
+                <div class="carrusel-historial" id="carruselHistorial">
+                    <div class="historial-vacio">No hay cartas</div>
+                </div>
+            </div>
+
+            <div class="btn-barajar-container" id="btnBarajarContainer">
+                <button class="btn-barajar" id="btnBarajar">🃏 ¡Barajar!</button>
+            </div>
+
+            <div class="carta-central oculta" id="cartaActual">
+                <img id="imagenCarta" src="" alt="Carta">
+                <div class="nombre-superior" id="nombreSuperior">
+                    <span class="personalizacion-carta" id="personalizacionSuperior"></span>
+                </div>
+                <div class="nombre-personalizado" id="nombrePersonalizado"></div>
+                <div class="progress-ring" id="progressRing">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                        <circle class="bg-circle" cx="20" cy="20" r="18"></circle>
+                        <circle class="progress-circle" id="progressCircle" cx="20" cy="20" r="18"></circle>
+                    </svg>
+                    <div class="label" id="progressLabel">0s</div>
+                </div>
+            </div>
+
+            <div class="mensaje-ganador" id="mensajeGanador">
+                <span class="icono-ganador">🏆</span>
+                <span id="textoGanador">🎉 ¡GANASTE! 🎉</span>
+            </div>
+        </div>
+
+        <div class="vista-cuadricula" id="vistaCuadricula">
+            <h2>⋆⁺₊☾ CARTA ☽₊⁺⋆</h2>
+            <div class="grid-container" id="gridContainer"></div>
+        </div>
+
+        <div class="vista-listado-fullscreen" id="vistaListadoFullscreen">
+            <div class="cerrar-fullscreen" id="cerrarFullscreen">✕</div>
+            <h2>📋 LISTADO DE CARTAS</h2>
+            <div class="listado-fullscreen-grid" id="listadoFullscreenGrid"></div>
+        </div>
+
+        <div class="modal-carta-grande" id="modalCartaGrande">
+            <div class="contenido-grande">
+                <div class="cerrar-grande" id="cerrarGrande">✕</div>
+                <div class="badge-gran-ganador">🏆</div>
+                <img class="imagen-grande" id="imagenGrande" src="" alt="Carta">
+                <div class="info-grande">
+                    <div class="nombre-grande" id="nombreGrande">El Gallo</div>
+                    <div class="personalizacion-grande" id="personalizacionGrande"></div>
+                    <div class="premio-grande" id="premioGrande">💰 $1000</div>
+                    <div class="numero-grande" id="numeroGrande">#1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-seleccion-ganador" id="modalSeleccionGanador">
+            <div class="contenido-seleccion">
+                <h2>👑 SELECCIONAR CARTA GANADORA</h2>
+                <div class="subtexto">Toca una carta para elegirla como ganadora. Será la última en aparecer.</div>
+                <div class="grid-seleccion" id="gridSeleccion"></div>
+                <div class="mensaje-seleccion" id="mensajeSeleccion">Selecciona una carta para que sea la ganadora</div>
+                <button class="btn-cerrar-seleccion" id="btnCerrarSeleccion">✕ Cerrar</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modalCostos">
+            <div class="modal-contenido">
+                <h3>⚜️ Costos / Premios</h3>
+                <div class="selector-valores" id="selectorValores">
+                    <button data-valor="2">2</button>
+                    <button data-valor="3" class="activo">3</button>
+                    <button data-valor="4">4</button>
+                </div>
+                <div class="inputs-container" id="inputsContainer"></div>
+                <button class="btn-aceptar-modal" id="btnAceptarCostos">Aceptar</button>
+            </div>
+        </div>
+
+        <div class="modal-personalizacion" id="modalPersonalizacion">
+            <div class="modal-contenido">
+                <h3>✎ Personalizar</h3>
+                <div class="icono-modal"><img id="imgPersonalizacion" src="" alt="Carta"></div>
+                <input type="text" id="inputPersonalizacion" placeholder="Ej: Juan, 777..." maxlength="20">
+                <div class="botones-modal">
+                    <button class="btn-guardar" id="btnGuardarPersonalizacion">Guardar</button>
+                    <button class="btn-cancelar" id="btnCancelarPersonalizacion">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controles">
+            <button class="btn btn-azul" id="btnMostrar">Mostrar</button>
+            <button class="btn btn-verde" id="btnMostrarTodas">Todas</button>
+            <button class="btn btn-naranja" id="btnListado">Listado</button>
+            <button class="btn btn-rojo" id="btnReiniciar">Reiniciar</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ---------- BASE DE DATOS 54 CARTAS ----------
+        const cartasBase = [
+            { id: 1, nombre: "El Gallo", imagen: "https://i.postimg.cc/CKGMLdyC/1-el-gallo.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_gallo.mp3" },
+            { id: 2, nombre: "El Diablito", imagen: "https://i.postimg.cc/6Qr65Tsr/2-el-diablito.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_diablito.mp3" },
+            { id: 3, nombre: "La Dama", imagen: "https://i.postimg.cc/N06GfLhk/3-la-dama.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_dama.mp3" },
+            { id: 4, nombre: "El Catrín", imagen: "https://i.postimg.cc/7L3PYbvM/4-el-catrin.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_catrin.mp3" },
+            { id: 5, nombre: "El Paraguas", imagen: "https://i.postimg.cc/s2YfD1FK/5-el-paraguas.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_paraguas.mp3" },
+            { id: 6, nombre: "La Sirena", imagen: "https://i.postimg.cc/7L3PYbvK/6-la-sirena.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_sirena.mp3" },
+            { id: 7, nombre: "La Escalera", imagen: "https://i.postimg.cc/rp1yFz6h/7-la-escalera.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_escalera.mp3" },
+            { id: 8, nombre: "La Botella", imagen: "https://i.postimg.cc/4364NnCF/8-la-botella.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_botella.mp3" },
+            { id: 9, nombre: "El Barril", imagen: "https://i.postimg.cc/HLwWsjGh/9-barril.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_barril.mp3" },
+            { id: 10, nombre: "El Árbol", imagen: "https://i.postimg.cc/zfCDX3mQ/10-arbol.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_arbol.mp3" },
+            { id: 11, nombre: "El Melón", imagen: "https://i.postimg.cc/9fdXFz3S/11-melon.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_melon.mp3" },
+            { id: 12, nombre: "El Valiente", imagen: "https://i.postimg.cc/1zGR54xL/12-el-valiente.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_valiente.mp3" },
+            { id: 13, nombre: "El Gorrito", imagen: "https://i.postimg.cc/xC9fkYY5/13-el-gorrito.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_gorrito.mp3" },
+            { id: 14, nombre: "La Muerte", imagen: "https://i.postimg.cc/HxTYJHH3/14-la-muerte.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_muerte.mp3" },
+            { id: 15, nombre: "La Pera", imagen: "https://i.postimg.cc/Qtj8Bss0/15-la-pera.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_pera.mp3" },
+            { id: 16, nombre: "La Bandera", imagen: "https://i.postimg.cc/gJGzwddt/16-la-bandera.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_bandera.mp3" },
+            { id: 17, nombre: "El Bandolón", imagen: "https://i.postimg.cc/qRpJt001/17-el-bandolon.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_bandolon.mp3" },
+            { id: 18, nombre: "El Violoncello", imagen: "https://i.postimg.cc/RFvS399b/18-el-violoncello.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_violoncello.mp3" },
+            { id: 19, nombre: "La Garza", imagen: "https://i.postimg.cc/k47JV99p/19-la-garza.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_garza.mp3" },
+            { id: 20, nombre: "El Pájaro", imagen: "https://i.postimg.cc/fLMz3ZZp/20-el-pajaro.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_pajaro.mp3" },
+            { id: 21, nombre: "La Mano", imagen: "https://i.postimg.cc/gJGzwddf/21-la-mano.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_mano.mp3" },
+            { id: 22, nombre: "La Bota", imagen: "https://i.postimg.cc/63BW7wwk/22-la-bota.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_bota.mp3" },
+            { id: 23, nombre: "La Luna", imagen: "https://i.postimg.cc/C1whZYSy/23-la-luna.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_luna.mp3" },
+            { id: 24, nombre: "El Cotorro", imagen: "https://i.postimg.cc/85TpFDNQ/24-el-cotorro.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_cotorro.mp3" },
+            { id: 25, nombre: "El Borracho", imagen: "https://i.postimg.cc/26CkqmrN/25-el-borracho.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_borracho.mp3" },
+            { id: 26, nombre: "El Negrito", imagen: "https://i.postimg.cc/vBGY1Mbd/26-el-negrito.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_negrito.mp3" },
+            { id: 27, nombre: "El Corazón", imagen: "https://i.postimg.cc/76qHCDwk/27-el-corazon.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_corazon.mp3" },
+            { id: 28, nombre: "La Sandía", imagen: "https://i.postimg.cc/1tymgPsy/28-la-sandia.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_sandia.mp3" },
+            { id: 29, nombre: "El Tambor", imagen: "https://i.postimg.cc/W3sNDjTT/29-el-tambor.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_tambor.mp3" },
+            { id: 30, nombre: "El Camarón", imagen: "https://i.postimg.cc/C1whZYSh/30-el-camaron.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_camaron.mp3" },
+            { id: 31, nombre: "Las Jaras", imagen: "https://i.postimg.cc/k47JV9qX/31-las-jaras.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/las_jaras.mp3" },
+            { id: 32, nombre: "El Músico", imagen: "https://i.postimg.cc/4dXfKZs3/32-el-musico.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_musico.mp3" },
+            { id: 33, nombre: "La Araña", imagen: "https://i.postimg.cc/63BW7wt3/33-la-arana.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_arania.mp3" },
+            { id: 34, nombre: "El Soldado", imagen: "https://i.postimg.cc/SsmSXqkR/34-el-soldado.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_soldado.mp3" },
+            { id: 35, nombre: "La Estrella", imagen: "https://i.postimg.cc/SsmSXqkj/35-la-estrella.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_estrella.mp3" },
+            { id: 36, nombre: "El Cazo", imagen: "https://i.postimg.cc/XJxVdhYj/36-el-cazo.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_cazo.mp3" },
+            { id: 37, nombre: "El Mundo", imagen: "https://i.postimg.cc/MTtWV4pZ/37-el-mundo.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_mundo.mp3" },
+            { id: 38, nombre: "El Apache", imagen: "https://i.postimg.cc/pTk2z7LX/38-el-apache.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_apache.mp3" },
+            { id: 39, nombre: "El Nopal", imagen: "https://i.postimg.cc/85w1M3zz/39-el-nopal.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_nopal.mp3" },
+            { id: 40, nombre: "El Alacrán", imagen: "https://i.postimg.cc/NMbgmVjF/40-el-alacran.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_alacran.mp3" },
+            { id: 41, nombre: "La Rosa", imagen: "https://i.postimg.cc/vBXQfjZD/41-la-rosa.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_rosa.mp3" },
+            { id: 42, nombre: "La Calavera", imagen: "https://i.postimg.cc/k4wnKZgR/42-la-calavera.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_calavera.mp3" },
+            { id: 43, nombre: "La Campana", imagen: "https://i.postimg.cc/TwQRgS3W/43-la-campana.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_campana.mp3" },
+            { id: 44, nombre: "El Cantarito", imagen: "https://i.postimg.cc/LXvHL781/44-el-cantarito.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_cantarito.mp3" },
+            { id: 45, nombre: "El Venado", imagen: "https://i.postimg.cc/vBXQfjZf/45-el-venado.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_venado.mp3" },
+            { id: 46, nombre: "El Sol", imagen: "https://i.postimg.cc/hjMSTwt8/46-el-sol.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_sol.mp3" },
+            { id: 47, nombre: "La Corona", imagen: "https://i.postimg.cc/sXKV78g9/47-la-corona.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_corona.mp3" },
+            { id: 48, nombre: "La Chalupa", imagen: "https://i.postimg.cc/V64YnTkW/48-la-chalupa.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_chalupa.mp3" },
+            { id: 49, nombre: "El Pino", imagen: "https://i.postimg.cc/Vv6zRRJC/49-el-pino.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_pino.mp3" },
+            { id: 50, nombre: "El Pescado", imagen: "https://i.postimg.cc/wMv9VV1Q/50-el-pescado.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_pescado.mp3" },
+            { id: 51, nombre: "La Palma", imagen: "https://i.postimg.cc/rsmqJJDJ/51-la-palma.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_palma.mp3" },
+            { id: 52, nombre: "La Maceta", imagen: "https://i.postimg.cc/L5XmTTJv/52-la-maceta.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_maceta.mp3" },
+            { id: 53, nombre: "El Arpa", imagen: "https://i.postimg.cc/Gt2bQQ4M/53-el-arpa.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/el_arpa.mp3" },
+            { id: 54, nombre: "La Rana", imagen: "https://i.postimg.cc/Wz3snndK/54-la-rana.jpg", audio: "https://pypsolucionesintegrales.com/gameloteria/assets/audios/la_rana.mp3" }
+        ];
+
+        // ---------- ESTADO ----------
+        let mazoActual = [];
+        let mazoGuardadoParaGrid = [];
+        let mazoOriginalParaListado = [];
+        let estadoCartasGrid = [];
+        let historialCartas = [];
+        let juegoComenzado = false;
+        let primerClicMostrar = true;
+        let mostrandoIndividual = false;
+        let cuadriculaAbierta = false;
+        let estaRevolviendo = false;
+        let barajando = false;
+        let cartaEnPersonalizacion = null;
+        let mazoRevelacion = [];
+        let cartaGanadoraId = null;
+        let juegoTerminado = false;
+        let cartaSeleccionadaGanadora = null;
+
+        // Variables para el hold-to-select
+        let holdTimer = null;
+        let holdInterval = null;
+        let holdStartTime = 0;
+        let isHolding = false;
+        const HOLD_DURATION = 5000;
+
+        // DOM
+        const appContainer = document.getElementById('appContainer');
+        const vistaIndividual = document.getElementById('vistaIndividual');
+        const vistaCuadricula = document.getElementById('vistaCuadricula');
+        const vistaListadoFullscreen = document.getElementById('vistaListadoFullscreen');
+        const listadoFullscreenGrid = document.getElementById('listadoFullscreenGrid');
+        const cerrarFullscreen = document.getElementById('cerrarFullscreen');
+        const gridContainer = document.getElementById('gridContainer');
+        const cartaCentral = document.getElementById('cartaActual');
+        const imagenCarta = document.getElementById('imagenCarta');
+        const nombrePersonalizado = document.getElementById('nombrePersonalizado');
+        const nombreSuperior = document.getElementById('nombreSuperior');
+        const personalizacionSuperior = document.getElementById('personalizacionSuperior');
+        const mensajeGanador = document.getElementById('mensajeGanador');
+        const textoGanador = document.getElementById('textoGanador');
+        const btnMostrar = document.getElementById('btnMostrar');
+        const btnMostrarTodas = document.getElementById('btnMostrarTodas');
+        const btnListado = document.getElementById('btnListado');
+        const btnReiniciar = document.getElementById('btnReiniciar');
+        const btnBarajar = document.getElementById('btnBarajar');
+        const btnBarajarContainer = document.getElementById('btnBarajarContainer');
+        const historialContainer = document.getElementById('historialContainer');
+        const carruselHistorial = document.getElementById('carruselHistorial');
+        const contadorHistorial = document.getElementById('contadorHistorial');
+        const modalCostos = document.getElementById('modalCostos');
+        const selectorValores = document.getElementById('selectorValores');
+        const inputsContainer = document.getElementById('inputsContainer');
+        const btnAceptarCostos = document.getElementById('btnAceptarCostos');
+        const modalPersonalizacion = document.getElementById('modalPersonalizacion');
+        const imgPersonalizacion = document.getElementById('imgPersonalizacion');
+        const inputPersonalizacion = document.getElementById('inputPersonalizacion');
+        const btnGuardarPersonalizacion = document.getElementById('btnGuardarPersonalizacion');
+        const btnCancelarPersonalizacion = document.getElementById('btnCancelarPersonalizacion');
+        const modalSeleccionGanador = document.getElementById('modalSeleccionGanador');
+        const gridSeleccion = document.getElementById('gridSeleccion');
+        const mensajeSeleccion = document.getElementById('mensajeSeleccion');
+        const btnCerrarSeleccion = document.getElementById('btnCerrarSeleccion');
+        const progressCircle = document.getElementById('progressCircle');
+        const progressLabel = document.getElementById('progressLabel');
+        const progressRing = document.getElementById('progressRing');
+
+        // DOM para modal de carta grande
+        const modalCartaGrande = document.getElementById('modalCartaGrande');
+        const cerrarGrande = document.getElementById('cerrarGrande');
+        const imagenGrande = document.getElementById('imagenGrande');
+        const nombreGrande = document.getElementById('nombreGrande');
+        const personalizacionGrande = document.getElementById('personalizacionGrande');
+        const premioGrande = document.getElementById('premioGrande');
+        const numeroGrande = document.getElementById('numeroGrande');
+
+        // ---------- FUNCIÓN DE REPRODUCCIÓN DE AUDIO ----------
+        function reproducirAudio(carta) {
+            if (!carta || !carta.audio) return;
+            
+            try {
+                const audio = new Audio(carta.audio);
+                audio.volume = 0.8;
+                audio.play().catch(error => {
+                    console.log('Error al reproducir audio:', error);
+                });
+            } catch (error) {
+                console.log('Error al crear audio:', error);
+            }
+        }
+
+        // ---------- FUNCIONES ----------
+        function generarMazoConCostos(costos, premios) {
+            const numValores = costos.length;
+
+            let cantidades = [];
+            if (numValores === 4) {
+                cantidades = [14, 14, 14, 12];
+            } else if (numValores === 3) {
+                cantidades = [18, 18, 18];
+            } else if (numValores === 2) {
+                cantidades = [27, 27];
+            } else {
+                cantidades = [54];
+            }
+
+            let grupos = [];
+            for (let i = 0; i < numValores; i++) {
+                for (let j = 0; j < cantidades[i]; j++) {
+                    grupos.push({ costo: costos[i], premio: premios[i] });
+                }
+            }
+
+            grupos.sort(() => Math.random() - 0.5);
+
+            return cartasBase.map((carta, idx) => ({
+                ...carta,
+                ...grupos[idx] || { costo: 0, premio: 0 }
+            })).sort(() => Math.random() - 0.5);
+        }
+
+        function guardarLocal() {
+            try {
+                localStorage.setItem('loteriaGallo', JSON.stringify({
+                    mazoGuardado: mazoGuardadoParaGrid,
+                    mazoOriginal: mazoOriginalParaListado,
+                    estadoCartas: estadoCartasGrid,
+                    historial: historialCartas,
+                    juegoComenzado: juegoComenzado,
+                    mazoRevelacion: mazoRevelacion,
+                    cartaGanadoraId: cartaGanadoraId,
+                    juegoTerminado: juegoTerminado,
+                    cartaSeleccionadaGanadora: cartaSeleccionadaGanadora
+                }));
+            } catch (e) {}
+        }
+
+        function cargarLocal() {
+            try {
+                const data = JSON.parse(localStorage.getItem('loteriaGallo'));
+                if (data && data.mazoGuardado && data.mazoGuardado.length === 54) {
+                    mazoGuardadoParaGrid = data.mazoGuardado;
+                    mazoOriginalParaListado = data.mazoOriginal || [...mazoGuardadoParaGrid];
+                    estadoCartasGrid = data.estadoCartas || Array(54).fill({ marcada: false, clicsDesbloqueo: 0,
+                        personalizacion: "" });
+                    historialCartas = data.historial || [];
+                    juegoComenzado = data.juegoComenzado || false;
+                    mazoRevelacion = data.mazoRevelacion || [...mazoGuardadoParaGrid].sort(() => Math.random() - 0.5);
+                    cartaGanadoraId = data.cartaGanadoraId || null;
+                    juegoTerminado = data.juegoTerminado || false;
+                    cartaSeleccionadaGanadora = data.cartaSeleccionadaGanadora || null;
+                    if (historialCartas.length > 0) {
+                        primerClicMostrar = false;
+                        mostrandoIndividual = true;
+                    }
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        function iniciarJuegoLimpio() {
+            btnMostrar.disabled = false;
+            btnMostrar.textContent = "Mostrar";
+            cartaCentral.className = 'carta-central oculta';
+            mensajeGanador.classList.remove('visible');
+            juegoComenzado = false;
+            primerClicMostrar = true;
+            mostrandoIndividual = false;
+            historialCartas = [];
+            cartaGanadoraId = null;
+            juegoTerminado = false;
+
+            const mazoGenerado = generarMazoConCostos([50, 25, 10], [1000, 800, 500]);
+            mazoGuardadoParaGrid = [...mazoGenerado];
+            mazoOriginalParaListado = [...mazoGenerado];
+            mazoActual = [...mazoGenerado];
+            
+            if (cartaSeleccionadaGanadora !== null) {
+                const cartasSinGanadora = mazoGenerado.filter(c => c.id !== cartaSeleccionadaGanadora);
+                const cartaGanadora = mazoGenerado.find(c => c.id === cartaSeleccionadaGanadora);
+                if (cartaGanadora) {
+                    mazoRevelacion = [...cartasSinGanadora.sort(() => Math.random() - 0.5), cartaGanadora];
+                } else {
+                    mazoRevelacion = [...mazoGenerado].sort(() => Math.random() - 0.5);
+                }
+            } else {
+                mazoRevelacion = [...mazoGenerado].sort(() => Math.random() - 0.5);
+            }
+
+            estadoCartasGrid = Array(54).fill({ marcada: false, clicsDesbloqueo: 0, personalizacion: "" });
+            vistaIndividual.style.display = 'flex';
+            vistaCuadricula.style.display = 'none';
+            btnMostrarTodas.textContent = "Todas";
+            cuadriculaAbierta = false;
+            historialContainer.classList.remove('visible');
+            btnBarajarContainer.classList.remove('visible');
+            actualizarHistorial();
+            guardarLocal();
+        }
+
+        function actualizarHistorial() {
+            carruselHistorial.innerHTML = '';
+            contadorHistorial.textContent = historialCartas.length;
+            if (historialCartas.length === 0) {
+                const vacio = document.createElement('div');
+                vacio.className = 'historial-vacio';
+                vacio.textContent = 'No hay cartas';
+                carruselHistorial.appendChild(vacio);
+                return;
+            }
+            historialCartas.forEach((carta, idx) => {
+                const div = document.createElement('div');
+                div.className = 'carta-historial-item';
+                if (idx === historialCartas.length - 1 && mazoRevelacion.length === 0) div.classList.add(
+                'ganadora-historial');
+                const img = document.createElement('img');
+                img.src = carta.imagen;
+                img.alt = carta.nombre;
+                div.appendChild(img);
+                const num = document.createElement('span');
+                num.className = 'numero-orden';
+                num.textContent = idx + 1;
+                div.appendChild(num);
+                carruselHistorial.appendChild(div);
+            });
+            setTimeout(() => carruselHistorial.scrollLeft = carruselHistorial.scrollWidth, 80);
+        }
+
+        // ---------- FUNCIÓN PARA VER CARTA GRANDE ----------
+        function verCartaGrande(carta) {
+            imagenGrande.src = carta.imagen;
+            imagenGrande.alt = carta.nombre;
+            nombreGrande.textContent = carta.nombre;
+            
+            const personalizacion = carta.personalizacion || '';
+            if (personalizacion.trim() !== '') {
+                personalizacionGrande.textContent = `✎ ${personalizacion}`;
+                personalizacionGrande.style.display = 'block';
+            } else {
+                personalizacionGrande.textContent = '';
+                personalizacionGrande.style.display = 'none';
+            }
+            
+            premioGrande.textContent = `💰 $${carta.premio || 0}`;
+            numeroGrande.textContent = `#${carta.id}`;
+            
+            modalCartaGrande.classList.add('activo');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarCartaGrande() {
+            modalCartaGrande.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalCartaGrande.classList.contains('activo')) {
+                cerrarCartaGrande();
+            }
+        });
+
+        modalCartaGrande.addEventListener('click', (e) => {
+            if (e.target === modalCartaGrande) {
+                cerrarCartaGrande();
+            }
+        });
+
+        cerrarGrande.addEventListener('click', cerrarCartaGrande);
+
+        // ---------- FUNCIONES DEL JUEGO ----------
+        function mostrarGanador(carta, premio) {
+            juegoTerminado = true;
+            cartaGanadoraId = carta.id;
+            btnMostrar.disabled = true;
+            btnMostrar.textContent = "¡Ganaste!";
+            cartaCentral.className = 'carta-central ganadora es-ganadora';
+            
+            nombreSuperior.classList.remove('visible');
+            
+            const texto = carta.personalizacion || '';
+
+            let mensaje = '';
+            if (texto.trim() !== '') {
+                nombrePersonalizado.textContent = texto;
+                nombrePersonalizado.style.display = 'block';
+                mensaje = `🎉 ${texto} - $${premio}`;
+            } else {
+                mensaje = `🎉 ¡GANASTE! $${premio}`;
+            }
+            
+            textoGanador.textContent = mensaje;
+            mensajeGanador.classList.add('visible');
+            guardarLocal();
+            
+            reproducirAudio(carta);
+        }
+
+        function revelarSiguiente() {
+            if (estaRevolviendo || juegoTerminado) return;
+
+            if (primerClicMostrar) {
+                primerClicMostrar = false;
+                btnBarajarContainer.classList.add('visible');
+                historialContainer.classList.remove('visible');
+                return;
+            }
+
+            if (!juegoComenzado) {
+                juegoComenzado = true;
+                btnBarajarContainer.classList.remove('visible');
+                if (mazoRevelacion.length === 0) {
+                    if (cartaSeleccionadaGanadora !== null) {
+                        const cartasSinGanadora = mazoGuardadoParaGrid.filter(c => c.id !== cartaSeleccionadaGanadora);
+                        const cartaGanadora = mazoGuardadoParaGrid.find(c => c.id === cartaSeleccionadaGanadora);
+                        if (cartaGanadora) {
+                            mazoRevelacion = [...cartasSinGanadora.sort(() => Math.random() - 0.5), cartaGanadora];
+                        } else {
+                            mazoRevelacion = [...mazoGuardadoParaGrid].sort(() => Math.random() - 0.5);
+                        }
+                    } else {
+                        mazoRevelacion = [...mazoGuardadoParaGrid].sort(() => Math.random() - 0.5);
+                    }
+                }
+            }
+
+            if (!mostrandoIndividual) {
+                mostrandoIndividual = true;
+                historialContainer.classList.add('visible');
+            }
+
+            if (mazoRevelacion.length === 0) {
+                const reveladas = new Set(historialCartas.map(c => c.id));
+                const restantes = mazoGuardadoParaGrid.filter(c => !reveladas.has(c.id));
+                if (restantes.length === 0) {
+                    return;
+                }
+                mazoRevelacion = restantes.sort(() => Math.random() - 0.5);
+            }
+
+            const carta = mazoRevelacion.shift();
+            if (!carta) return;
+
+            historialCartas.push(carta);
+            actualizarHistorial();
+            cartaCentral.className = 'carta-central';
+            imagenCarta.src = carta.imagen;
+            imagenCarta.alt = carta.nombre;
+            
+            const indexEnGrid = mazoGuardadoParaGrid.findIndex(c => c.id === carta.id);
+            let personalizacion = '';
+            if (indexEnGrid !== -1 && estadoCartasGrid[indexEnGrid]) {
+                personalizacion = estadoCartasGrid[indexEnGrid].personalizacion || '';
+            }
+            
+            const totalReveladas = historialCartas.length;
+            if (totalReveladas < 54 && personalizacion.trim() !== '') {
+                personalizacionSuperior.textContent = personalizacion;
+                nombreSuperior.classList.add('visible');
+            } else {
+                nombreSuperior.classList.remove('visible');
+                personalizacionSuperior.textContent = '';
+            }
+            
+            nombrePersonalizado.style.display = 'none';
+            nombrePersonalizado.textContent = '';
+            guardarLocal();
+
+            reproducirAudio(carta);
+
+            if (totalReveladas >= 54) {
+                const premio = carta.premio || 0;
+                mostrarGanador(carta, premio);
+            }
+            guardarLocal();
+        }
+
+        // ---------- FUNCIÓN PARA IR AL LISTADO CON EL GANADOR ----------
+        function irAlListadoGanador() {
+            if (!juegoTerminado || cartaGanadoraId === null) return;
+            
+            mensajeGanador.classList.remove('visible');
+            
+            if (!vistaListadoFullscreen.classList.contains('activo')) {
+                dibujarListadoFullscreenConGanador();
+                vistaListadoFullscreen.classList.add('activo');
+                document.body.style.overflow = 'hidden';
+            } else {
+                dibujarListadoFullscreenConGanador();
+            }
+        }
+
+        function dibujarListadoFullscreenConGanador() {
+            listadoFullscreenGrid.innerHTML = '';
+
+            const cartasConPersonalizacion = mazoOriginalParaListado.map((carta, idx) => {
+                const estado = estadoCartasGrid[idx] || { marcada: false, clicsDesbloqueo: 0, personalizacion: "" };
+                return { 
+                    ...carta, 
+                    index: idx, 
+                    personalizacion: estado.personalizacion || "", 
+                    marcada: estado.marcada,
+                    esGanadora: carta.id === cartaGanadoraId
+                };
+            });
+
+            cartasConPersonalizacion.forEach((carta) => {
+                const div = document.createElement('div');
+                div.className = 'listado-fullscreen-item';
+                if (carta.esGanadora) {
+                    div.classList.add('ganador-listado');
+                }
+
+                const img = document.createElement('img');
+                img.src = carta.imagen;
+                img.alt = carta.nombre;
+                div.appendChild(img);
+
+                const info = document.createElement('div');
+                info.className = 'listado-info';
+
+                const index = document.createElement('span');
+                index.className = 'listado-index';
+                index.textContent = `#${carta.index + 1}`;
+                info.appendChild(index);
+
+                const nombre = document.createElement('span');
+                nombre.className = 'listado-nombre';
+                nombre.textContent = carta.nombre;
+                info.appendChild(nombre);
+
+                const personalizacion = document.createElement('span');
+                personalizacion.className = 'listado-personalizacion';
+                if (carta.personalizacion && carta.personalizacion.trim() !== '') {
+                    personalizacion.textContent = `✎ ${carta.personalizacion}`;
+                    personalizacion.classList.remove('vacio');
+                } else {
+                    personalizacion.textContent = '—';
+                    personalizacion.classList.add('vacio');
+                }
+                info.appendChild(personalizacion);
+
+                const badge = document.createElement('span');
+                badge.className = 'badge-ganador-listado';
+                badge.textContent = '🏆 GANADOR';
+                info.appendChild(badge);
+
+                div.appendChild(info);
+                listadoFullscreenGrid.appendChild(div);
+
+                div.addEventListener('click', () => {
+                    if (carta.esGanadora) {
+                        verCartaGrande(carta);
+                    }
+                });
+            });
+
+            setTimeout(() => {
+                const ganadorElement = listadoFullscreenGrid.querySelector('.ganador-listado');
+                if (ganadorElement) {
+                    ganadorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 300);
+        }
+
+        function dibujarCuadricula() {
+            vistaIndividual.style.display = 'none';
+            vistaCuadricula.style.display = 'flex';
+            gridContainer.innerHTML = '';
+            btnMostrarTodas.textContent = "Ocultar";
+            cuadriculaAbierta = true;
+            mostrandoIndividual = false;
+            historialContainer.classList.remove('visible');
+            btnBarajarContainer.classList.remove('visible');
+
+            mazoGuardadoParaGrid.forEach((carta, idx) => {
+                const div = document.createElement('div');
+                div.className = 'carta-grid';
+                div.dataset.index = idx;
+                if (carta.id === cartaGanadoraId && juegoTerminado) {
+                    div.classList.add('ganadora-grid');
+                }
+                const img = document.createElement('img');
+                img.src = carta.imagen;
+                img.alt = carta.nombre;
+                const costosDiv = document.createElement('div');
+                costosDiv.className = 'costos-grid';
+                costosDiv.innerHTML = `<span>$${carta.costo}</span><span>$${carta.premio}</span>`;
+                div.appendChild(img);
+                div.appendChild(costosDiv);
+                
+                const badge = document.createElement('span');
+                badge.className = 'badge-ganador';
+                badge.textContent = '🏆';
+                div.appendChild(badge);
+                
+                gridContainer.appendChild(div);
+
+                const estado = estadoCartasGrid[idx] || { marcada: false, clicsDesbloqueo: 0, personalizacion: "" };
+                if (estado.marcada) {
+                    div.classList.add('marcada');
+                    div.dataset.clicsDesbloqueo = estado.clicsDesbloqueo || 0;
+                }
+
+                div.addEventListener('click', function() {
+                    if (juegoTerminado) {
+                        if (carta.id === cartaGanadoraId) {
+                            verCartaGrande(carta);
+                        }
+                        return;
+                    }
+                    const i = parseInt(this.dataset.index);
+                    const cartaData = mazoGuardadoParaGrid[i];
+                    if (!this.classList.contains('marcada')) {
+                        cartaEnPersonalizacion = i;
+                        imgPersonalizacion.src = cartaData.imagen;
+                        imgPersonalizacion.alt = cartaData.nombre;
+                        inputPersonalizacion.value = "";
+                        modalPersonalizacion.classList.add('activo');
+                        return;
+                    }
+                    let cont = parseInt(this.dataset.clicsDesbloqueo) || 0;
+                    cont++;
+                    this.dataset.clicsDesbloqueo = cont;
+                    estadoCartasGrid[i] = {
+                        marcada: true,
+                        clicsDesbloqueo: cont,
+                        personalizacion: estadoCartasGrid[i]?.personalizacion || "",
+                        nombre: cartaData.nombre
+                    };
+                    guardarLocal();
+                    if (cont >= 5) {
+                        this.classList.remove('marcada');
+                        this.dataset.clicsDesbloqueo = 0;
+                        estadoCartasGrid[i] = { marcada: false, clicsDesbloqueo: 0, personalizacion: "",
+                            nombre: cartaData.nombre };
+                        guardarLocal();
+                    }
+                });
+            });
+        }
+
+        // ---------- BARAJAR ----------
+        function iniciarBarajeo() {
+            if (barajando) return;
+            barajando = true;
+            btnBarajar.disabled = true;
+            btnBarajar.textContent = "🔄 Barajando...";
+
+            const historialBackup = [...historialCartas];
+
+            const muestra = [...cartasBase].sort(() => Math.random() - 0.5).slice(0, 12);
+            carruselHistorial.innerHTML = '';
+            muestra.forEach((c, idx) => {
+                const div = document.createElement('div');
+                div.className = 'carta-historial-item';
+                const img = document.createElement('img');
+                img.src = c.imagen;
+                img.alt = c.nombre;
+                div.appendChild(img);
+                const num = document.createElement('span');
+                num.className = 'numero-orden';
+                num.textContent = idx + 1;
+                div.appendChild(num);
+                carruselHistorial.appendChild(div);
+            });
+            historialContainer.classList.add('visible');
+            carruselHistorial.classList.add('barajeando');
+            cartaCentral.className = 'carta-central barajeando';
+            cartaCentral.classList.remove('oculta');
+
+            let count = 0;
+            const intervalo = setInterval(() => {
+                if (count >= 6) { clearInterval(intervalo); return; }
+                const nuevas = [...cartasBase].sort(() => Math.random() - 0.5).slice(0, 12);
+                const items = carruselHistorial.querySelectorAll('.carta-historial-item');
+                items.forEach((it, i) => {
+                    if (i < nuevas.length) {
+                        const img = it.querySelector('img');
+                        img.src = nuevas[i].imagen;
+                        img.alt = nuevas[i].nombre;
+                    }
+                });
+                const rand = cartasBase[Math.floor(Math.random() * cartasBase.length)];
+                imagenCarta.src = rand.imagen;
+                imagenCarta.alt = rand.nombre;
+                count++;
+            }, 250);
+
+            setTimeout(() => {
+                clearInterval(intervalo);
+                cartaCentral.classList.remove('barajeando');
+                cartaCentral.className = 'carta-central oculta';
+                carruselHistorial.classList.remove('barajeando');
+
+                historialCartas = historialBackup;
+                actualizarHistorial();
+
+                if (historialCartas.length === 0) {
+                    historialContainer.classList.remove('visible');
+                }
+
+                btnBarajar.disabled = false;
+                btnBarajar.textContent = "🃏 ¡Barajar!";
+                barajando = false;
+            }, 2500);
+        }
+
+        // ---------- REINICIAR ----------
+        function reiniciarJuego() {
+            if (estaRevolviendo) return;
+            estaRevolviendo = true;
+
+            btnMostrar.disabled = true;
+            btnMostrar.textContent = "Reiniciando...";
+            cartaCentral.className = 'carta-central oculta';
+            mensajeGanador.classList.remove('visible');
+            historialCartas = [];
+            actualizarHistorial();
+            vistaIndividual.style.display = 'flex';
+            vistaCuadricula.style.display = 'none';
+            btnMostrarTodas.textContent = "Todas";
+            mostrandoIndividual = false;
+            historialContainer.classList.remove('visible');
+            btnBarajarContainer.classList.remove('visible');
+            juegoTerminado = false;
+            cartaGanadoraId = null;
+            cartaSeleccionadaGanadora = null;
+
+            appContainer.classList.add('revolviendo');
+
+            setTimeout(() => {
+                appContainer.classList.remove('revolviendo');
+                cartaCentral.className = 'carta-central oculta';
+                historialContainer.classList.remove('visible');
+
+                btnMostrar.disabled = false;
+                btnMostrar.textContent = "Mostrar";
+
+                const nuevoMazo = generarMazoConCostos([50, 25, 10], [1000, 800, 500]);
+                mazoGuardadoParaGrid = [...nuevoMazo];
+                mazoOriginalParaListado = [...nuevoMazo];
+                mazoActual = [...nuevoMazo];
+                mazoRevelacion = [...nuevoMazo].sort(() => Math.random() - 0.5);
+
+                estadoCartasGrid = Array(54).fill({ marcada: false, clicsDesbloqueo: 0, personalizacion: "" });
+                localStorage.removeItem('loteriaGallo');
+                juegoComenzado = false;
+                primerClicMostrar = true;
+                historialCartas = [];
+                actualizarHistorial();
+                estaRevolviendo = false;
+                btnBarajarContainer.classList.remove('visible');
+                if (cuadriculaAbierta) {
+                    vistaCuadricula.style.display = 'none';
+                    vistaIndividual.style.display = 'flex';
+                    btnMostrarTodas.textContent = "Todas";
+                    cuadriculaAbierta = false;
+                }
+                guardarLocal();
+            }, 800);
+        }
+
+        // ---------- LISTADO FULLSCREEN ----------
+        function toggleListadoFullscreen() {
+            if (estaRevolviendo) return;
+            if (cuadriculaAbierta) {
+                vistaCuadricula.style.display = 'none';
+                vistaIndividual.style.display = 'flex';
+                btnMostrarTodas.textContent = "Todas";
+                cuadriculaAbierta = false;
+                if (!mostrandoIndividual) historialContainer.classList.remove('visible');
+            }
+
+            if (!vistaListadoFullscreen.classList.contains('activo')) {
+                dibujarListadoFullscreenConGanador();
+                vistaListadoFullscreen.classList.add('activo');
+                document.body.style.overflow = 'hidden';
+            } else {
+                vistaListadoFullscreen.classList.remove('activo');
+                document.body.style.overflow = '';
+            }
+        }
+
+        cerrarFullscreen.addEventListener('click', toggleListadoFullscreen);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && vistaListadoFullscreen.classList.contains('activo')) {
+                toggleListadoFullscreen();
+            }
+        });
+
+        // ---------- EVENTO DEL MENSAJE GANADOR ----------
+        mensajeGanador.addEventListener('click', irAlListadoGanador);
+
+        // ---------- MODAL COSTOS ----------
+        function generarInputs(cantidad) {
+            inputsContainer.innerHTML = '';
+            const valoresPredeterminados = [
+                { costo: 50, premio: 1000 },
+                { costo: 30, premio: 750 },
+                { costo: 20, premio: 500 },
+                { costo: 10, premio: 250 }
+            ];
+            for (let i = 0; i < cantidad; i++) {
+                const fila = document.createElement('div');
+                fila.className = 'fila-input';
+                const valCosto = valoresPredeterminados[i]?.costo || 5;
+                const valPremio = valoresPredeterminados[i]?.premio || 100;
+                fila.innerHTML = `<label>Valor ${i+1}</label>
+                        <input type="number" class="input-costo" value="${valCosto}">
+                        <input type="number" class="input-premio" value="${valPremio}">`;
+                inputsContainer.appendChild(fila);
+            }
+        }
+
+        function abrirModalCostos() {
+            if (estaRevolviendo) return;
+            selectorValores.querySelectorAll('button').forEach(b => b.classList.remove('activo'));
+            selectorValores.querySelector('[data-valor="3"]').classList.add('activo');
+            generarInputs(3);
+            modalCostos.classList.add('activo');
+        }
+
+        function aceptarCostos() {
+            const activo = selectorValores.querySelector('.activo');
+            const cantidad = parseInt(activo.dataset.valor);
+            const costosInputs = inputsContainer.querySelectorAll('.input-costo');
+            const premiosInputs = inputsContainer.querySelectorAll('.input-premio');
+            let costos = [],
+                premios = [];
+            for (let i = 0; i < cantidad; i++) {
+                const c = parseInt(costosInputs[i].value);
+                const p = parseInt(premiosInputs[i].value);
+                if (isNaN(c) || isNaN(p) || c < 0 || p < 0) { alert("Números válidos"); return; }
+                costos.push(c);
+                premios.push(p);
+            }
+            modalCostos.classList.remove('activo');
+            const nuevoMazo = generarMazoConCostos(costos, premios);
+            mazoGuardadoParaGrid = [...nuevoMazo];
+            mazoOriginalParaListado = [...nuevoMazo];
+            mazoActual = [...nuevoMazo];
+            
+            if (cartaSeleccionadaGanadora !== null) {
+                const cartasSinGanadora = nuevoMazo.filter(c => c.id !== cartaSeleccionadaGanadora);
+                const cartaGanadora = nuevoMazo.find(c => c.id === cartaSeleccionadaGanadora);
+                if (cartaGanadora) {
+                    mazoRevelacion = [...cartasSinGanadora.sort(() => Math.random() - 0.5), cartaGanadora];
+                } else {
+                    mazoRevelacion = [...nuevoMazo].sort(() => Math.random() - 0.5);
+                }
+            } else {
+                mazoRevelacion = [...nuevoMazo].sort(() => Math.random() - 0.5);
+            }
+            
+            estadoCartasGrid = Array(54).fill({ marcada: false, clicsDesbloqueo: 0, personalizacion: "" });
+            juegoTerminado = false;
+            cartaGanadoraId = null;
+            guardarLocal();
+            if (cuadriculaAbierta) dibujarCuadricula();
+            if (vistaListadoFullscreen.classList.contains('activo')) {
+                dibujarListadoFullscreenConGanador();
+            }
+        }
+
+        // ---------- SELECCIÓN DE GANADOR (Hold to Select) ----------
+        function iniciarHold() {
+            if (estaRevolviendo || barajando || juegoTerminado) return;
+            if (isHolding) return;
+            
+            isHolding = true;
+            holdStartTime = Date.now();
+            
+            cartaCentral.classList.add('seleccionando');
+            progressRing.style.display = 'block';
+            progressCircle.style.strokeDashoffset = '113.097';
+            progressLabel.textContent = '0s';
+            
+            holdInterval = setInterval(() => {
+                const elapsed = Date.now() - holdStartTime;
+                const progress = Math.min(elapsed / HOLD_DURATION, 1);
+                const circumference = 113.097;
+                const offset = circumference * (1 - progress);
+                progressCircle.style.strokeDashoffset = offset;
+                progressLabel.textContent = Math.floor(progress * 5) + 's';
+                
+                if (progress >= 1) {
+                    clearInterval(holdInterval);
+                    holdInterval = null;
+                    abrirSelectorGanador();
+                    cancelarHold();
+                }
+            }, 100);
+        }
+
+        function cancelarHold() {
+            isHolding = false;
+            if (holdInterval) {
+                clearInterval(holdInterval);
+                holdInterval = null;
+            }
+            cartaCentral.classList.remove('seleccionando');
+            progressRing.style.display = 'none';
+            progressCircle.style.strokeDashoffset = '113.097';
+            progressLabel.textContent = '0s';
+        }
+
+        cartaCentral.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            if (!cartaCentral.classList.contains('oculta')) return;
+            iniciarHold();
+        });
+        
+        cartaCentral.addEventListener('mouseup', cancelarHold);
+        cartaCentral.addEventListener('mouseleave', cancelarHold);
+        
+        cartaCentral.addEventListener('touchstart', (e) => {
+            if (!cartaCentral.classList.contains('oculta')) return;
+            iniciarHold();
+        }, { passive: true });
+        
+        cartaCentral.addEventListener('touchend', cancelarHold);
+        cartaCentral.addEventListener('touchcancel', cancelarHold);
+
+        // ---------- FUNCIONES DEL MODAL DE SELECCIÓN ----------
+        function abrirSelectorGanador() {
+            if (juegoTerminado) {
+                alert("El juego ya terminó. Reinicia para seleccionar un nuevo ganador.");
+                return;
+            }
+            
+            modalSeleccionGanador.classList.add('activo');
+            document.body.style.overflow = 'hidden';
+            dibujarSelectorGanador();
+        }
+
+        function dibujarSelectorGanador() {
+            gridSeleccion.innerHTML = '';
+            mensajeSeleccion.textContent = 'Toca una carta para elegirla como ganadora. Será la última en aparecer.';
+            
+            const cartasParaSeleccion = mazoGuardadoParaGrid.map((carta, idx) => {
+                return { ...carta, index: idx };
+            });
+            
+            cartasParaSeleccion.forEach((carta) => {
+                const div = document.createElement('div');
+                div.className = 'carta-seleccion';
+                if (carta.id === cartaSeleccionadaGanadora) {
+                    div.classList.add('seleccionada');
+                }
+                if (carta.id === cartaGanadoraId && juegoTerminado) {
+                    div.classList.add('ya-ganadora');
+                }
+                
+                const img = document.createElement('img');
+                img.src = carta.imagen;
+                img.alt = carta.nombre;
+                div.appendChild(img);
+                
+                const nombreSpan = document.createElement('span');
+                nombreSpan.className = 'nombre-seleccion';
+                nombreSpan.textContent = carta.nombre;
+                div.appendChild(nombreSpan);
+                
+                div.addEventListener('click', () => {
+                    if (div.classList.contains('ya-ganadora')) {
+                        mensajeSeleccion.textContent = '⚠️ Esta carta ya es la ganadora del juego actual.';
+                        return;
+                    }
+                    
+                    cartaSeleccionadaGanadora = carta.id;
+                    
+                    const cartasSinGanadora = mazoGuardadoParaGrid.filter(c => c.id !== cartaSeleccionadaGanadora);
+                    const cartaGanadora = mazoGuardadoParaGrid.find(c => c.id === cartaSeleccionadaGanadora);
+                    
+                    if (cartaGanadora) {
+                        if (juegoComenzado) {
+                            mazoRevelacion = mazoRevelacion.filter(c => c.id !== cartaSeleccionadaGanadora);
+                            mazoRevelacion.push(cartaGanadora);
+                        } else {
+                            mazoRevelacion = [...cartasSinGanadora.sort(() => Math.random() - 0.5), cartaGanadora];
+                        }
+                    }
+                    
+                    document.querySelectorAll('.carta-seleccion').forEach(el => el.classList.remove('seleccionada'));
+                    div.classList.add('seleccionada');
+                    
+                    mensajeSeleccion.textContent = `✅ ¡"${carta.nombre}" seleccionada como ganadora! Será la última en aparecer.`;
+                    
+                    guardarLocal();
+                });
+                
+                gridSeleccion.appendChild(div);
+            });
+        }
+
+        function cerrarSelectorGanador() {
+            modalSeleccionGanador.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+
+        btnCerrarSeleccion.addEventListener('click', cerrarSelectorGanador);
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalSeleccionGanador.classList.contains('activo')) {
+                cerrarSelectorGanador();
+            }
+        });
+        
+        modalSeleccionGanador.addEventListener('click', (e) => {
+            if (e.target === modalSeleccionGanador) {
+                cerrarSelectorGanador();
+            }
+        });
+
+        // ---------- EVENTOS ----------
+        btnMostrar.addEventListener('click', revelarSiguiente);
+        btnMostrarTodas.addEventListener('click', toggleCuadricula);
+        btnListado.addEventListener('click', toggleListadoFullscreen);
+        btnReiniciar.addEventListener('click', reiniciarJuego);
+        btnBarajar.addEventListener('click', iniciarBarajeo);
+
+        function toggleCuadricula() {
+            if (estaRevolviendo) return;
+            if (vistaListadoFullscreen.classList.contains('activo')) {
+                vistaListadoFullscreen.classList.remove('activo');
+            }
+            if (!cuadriculaAbierta) {
+                dibujarCuadricula();
+            } else {
+                vistaCuadricula.style.display = 'none';
+                vistaIndividual.style.display = 'flex';
+                btnMostrarTodas.textContent = "Todas";
+                cuadriculaAbierta = false;
+                if (!mostrandoIndividual) historialContainer.classList.remove('visible');
+            }
+        }
+
+        let timerPresion = null;
+        btnMostrarTodas.addEventListener('mousedown', () => {
+            timerPresion = setTimeout(() => { abrirModalCostos(); }, 2000);
+        });
+        btnMostrarTodas.addEventListener('mouseup', () => { clearTimeout(timerPresion); });
+        btnMostrarTodas.addEventListener('mouseleave', () => { clearTimeout(timerPresion); });
+        btnMostrarTodas.addEventListener('touchstart', () => {
+            timerPresion = setTimeout(() => { abrirModalCostos(); }, 2000);
+        });
+        btnMostrarTodas.addEventListener('touchend', () => { clearTimeout(timerPresion); });
+
+        selectorValores.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                selectorValores.querySelectorAll('button').forEach(b => b.classList.remove('activo'));
+                e.target.classList.add('activo');
+                generarInputs(parseInt(e.target.dataset.valor));
+            }
+        });
+        btnAceptarCostos.addEventListener('click', aceptarCostos);
+
+        btnGuardarPersonalizacion.addEventListener('click', () => {
+            if (cartaEnPersonalizacion !== null) {
+                const texto = inputPersonalizacion.value.trim();
+                const carta = mazoGuardadoParaGrid[cartaEnPersonalizacion];
+                estadoCartasGrid[cartaEnPersonalizacion] = {
+                    marcada: true,
+                    clicsDesbloqueo: 0,
+                    personalizacion: texto,
+                    nombre: carta.nombre
+                };
+                guardarLocal();
+                modalPersonalizacion.classList.remove('activo');
+                cartaEnPersonalizacion = null;
+                if (cuadriculaAbierta) dibujarCuadricula();
+                if (vistaListadoFullscreen.classList.contains('activo')) {
+                    dibujarListadoFullscreenConGanador();
+                }
+            }
+        });
+        btnCancelarPersonalizacion.addEventListener('click', () => {
+            modalPersonalizacion.classList.remove('activo');
+            cartaEnPersonalizacion = null;
+        });
+
+        // ---------- INICIO ----------
+        function iniciarApp() {
+            const cargado = cargarLocal();
+            if (cargado) {
+                mazoActual = [...mazoGuardadoParaGrid];
+                if (!mazoRevelacion || mazoRevelacion.length === 0) {
+                    if (cartaSeleccionadaGanadora !== null) {
+                        const cartasSinGanadora = mazoGuardadoParaGrid.filter(c => c.id !== cartaSeleccionadaGanadora);
+                        const cartaGanadora = mazoGuardadoParaGrid.find(c => c.id === cartaSeleccionadaGanadora);
+                        if (cartaGanadora) {
+                            mazoRevelacion = [...cartasSinGanadora.sort(() => Math.random() - 0.5), cartaGanadora];
+                        } else {
+                            mazoRevelacion = [...mazoGuardadoParaGrid].sort(() => Math.random() - 0.5);
+                        }
+                    } else {
+                        mazoRevelacion = [...mazoGuardadoParaGrid].sort(() => Math.random() - 0.5);
+                    }
+                }
+                btnMostrar.disabled = false;
+                btnMostrar.textContent = "Mostrar";
+                cartaCentral.className = 'carta-central oculta';
+                mensajeGanador.classList.remove('visible');
+                if (juegoTerminado && cartaGanadoraId !== null) {
+                    const cartaGanadora = mazoGuardadoParaGrid.find(c => c.id === cartaGanadoraId);
+                    if (cartaGanadora) {
+                        const premio = cartaGanadora.premio || 0;
+                        const texto = cartaGanadora.personalizacion || '';
+                        let mensaje = '';
+                        if (texto.trim() !== '') {
+                            mensaje = `🎉 ${texto} - $${premio}`;
+                        } else {
+                            mensaje = `🎉 ¡GANASTE! $${premio}`;
+                        }
+                        textoGanador.textContent = mensaje;
+                        mensajeGanador.classList.add('visible');
+                        btnMostrar.disabled = true;
+                        btnMostrar.textContent = "¡Ganaste!";
+                        cartaCentral.className = 'carta-central ganadora es-ganadora';
+                        imagenCarta.src = cartaGanadora.imagen;
+                        imagenCarta.alt = cartaGanadora.nombre;
+                        nombreSuperior.classList.remove('visible');
+                        if (texto.trim() !== '') {
+                            nombrePersonalizado.textContent = texto;
+                            nombrePersonalizado.style.display = 'block';
+                        }
+                    }
+                }
+                if (juegoComenzado && !juegoTerminado) {
+                    historialContainer.classList.add('visible');
+                    btnBarajarContainer.classList.remove('visible');
+                    mostrandoIndividual = true;
+                } else {
+                    historialContainer.classList.remove('visible');
+                    btnBarajarContainer.classList.remove('visible');
+                }
+                actualizarHistorial();
+                vistaIndividual.style.display = 'flex';
+                vistaCuadricula.style.display = 'none';
+                btnMostrarTodas.textContent = "Todas";
+                cuadriculaAbierta = false;
+            } else {
+                iniciarJuegoLimpio();
+            }
+        }
+
+        iniciarApp();
+    </script>
+</body>
+</html>
